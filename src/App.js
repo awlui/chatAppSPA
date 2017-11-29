@@ -1,46 +1,41 @@
 import React, { Component } from 'react';
 import './App.css';
 import {
-  Navbar,
-  MenuItem,
-  Nav,
-  NavDropdown,
   Grid,
   Col,
-  Row
+  Row,
 } from 'react-bootstrap';
 import {
   Link,
   Route,
   BrowserRouter as Router,
-  withRouter,
-  NavLink,
   Redirect
 } from 'react-router-dom';
-import SignUp from './signup';
-import Login from './Login';
 import {connect} from 'redxjs';
 import store from './stores/redxjsStore';
 import dm from './externals/chatAppAdapter.js';
+import {SignUp, ChatNav, Login} from './components';
+import {PublicOnlyRoute} from './helpers';
 class App extends Component {
   componentWillMount() {
-    dm.masterObservable.subscribe((e: any) => {
-      console.log(e, 'master')
-    })
+    let {reducerObservable} = this.props;
+    reducerObservable();
   }
   render() {
+    let {logout} = this.props;
+    let {token} = this.props.auth;
     return (
       <Router>
       <div className="App">
-        <Foo />
+        <ChatNav logout={logout} isAuthenticated={token}/>
         <Grid className="show-grid">
           <Row>
             <Col xs={12}>
               <Route exact path="/" component={Home}/>
               <Route path="/about" component={AboutTwo}/>
-              <Route path ="/login" component={Login}/>
               <Route path="/topics" component={Topics}/>
-              <Route path="/signup" component={SignUp}/>
+              <PublicOnlyRoute path="/login" isAuthenticated={token} component={Login}/>
+              <PublicOnlyRoute path="/signup" isAuthenticated={token} component={SignUp}/>
             </Col>
           </Row>
         </Grid>
@@ -49,30 +44,41 @@ class App extends Component {
     );
   }
 }
-App = connect(stateToProps)(App);
+let stateToProps = (state) => ({
+  auth: state.auth
+})
+let dispatchToProps = (dispatch) => ({
+  logout: (history, e) => {
+    dispatch({
+      type: 'DEAUTHENTICATE'
+    });
+    history.push("/");
+  },
+  reducerObservable: () => {
+    dm.masterObservable.subscribe((e: any) => {
+      console.log("EVENT NAME", e.name, store.getState())
+      switch(e.name) {
+        case 'authenticated':
+          dispatch({
+            type: 'AUTHENTICATE',
+            token: e.wsmessage.token
+          })
+          break;
+        case 'unauthorized':
+          break;
+        case 'reconnected':
+          dm.relogin(store.getState().auth.token);
+      default:
+        break;
+
+
+      }
+    })
+  } 
+})
+App = connect(stateToProps, dispatchToProps)(App);
 export default App;
 
-let Foo = ({location}) => {
-  return (
-  <Navbar inverse collapseOnSelect>
-    <Navbar.Header>
-      <Navbar.Brand>
-        <RouterLink to="/" className="navbar-brand">Home</RouterLink>
-      </Navbar.Brand>
-      <Navbar.Toggle />
-    </Navbar.Header>
-    <Navbar.Collapse>
-      <Nav pullRight>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/login">Login</RouterLink>
-        <RouterLink to="/topics">Topic</RouterLink>
-      </Nav>
-    </Navbar.Collapse>
-  </Navbar>
-)
-}
-Foo = withRouter(Foo);
 const Home = ({location}) => {
   return (
   <div>
@@ -80,13 +86,10 @@ const Home = ({location}) => {
   </div>
 )
 }
-let stateToProps = (state) => ({
-  auth: state.auth
-})
+
 let About = ({auth}, context) => {
   return (
   <div>
-    <h1>{JSON.stringify(auth)}</h1>
     <h2>About</h2>
   </div>
 )
@@ -125,28 +128,6 @@ const Topic = ({ match }) => (
   </div>
 )
 
-let RouterLink = ({ to, children, location, ...props }) => {
-  // use activeStyle from bootstrap.css of your theme
-  // search for:  .navbar-default .navbar-nav > .active > a,
-  let {className} = props;
-  return (
-    <li>
-      <NavLink to={to} className={className}>{children}</NavLink>
-    </li>)
-}
-RouterLink = withRouter(RouterLink);
 
 
 
-const PrivateRoute = ({ component: Component, isAuthenticated = false, ...rest }) => (
-  <Route {...rest} render={props => (
-    isAuthenticated ? (
-      <Component {...props}/>
-    ) : (
-      <Redirect to={{
-        pathname: '/login',
-        state: { from: props.location }
-      }}/>
-    )
-  )}/>
-)

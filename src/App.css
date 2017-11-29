@@ -26,9 +26,25 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }*/
+
 .login {
+  text-align: center;
+}
+.loginButton {
   margin: 10px;
 }
 .signup {
   padding: 0.5em;
+}
+
+.pass {
+  background-color: green;
+}
+
+.fail {
+  background-color: red;
+}
+
+div.alert.alert-danger {
+  margin: 0;
 }

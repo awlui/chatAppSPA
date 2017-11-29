@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 import {
   Col,
   Form,
@@ -9,29 +8,32 @@ import {
   Button
 } from 'react-bootstrap';
 import {
-  Link
+  Link,
 } from 'react-router-dom';
 import {
   connect
 } from 'redxjs';
-import dm from './externals/chatAppAdapter';
-import store from './stores/redxjsStore';
+import dm from '../externals/chatAppAdapter';
+
+
+
 class Login extends Component {
+  componentWillUnmount() {
+    let {resetLogin} = this.props;
+    resetLogin();
+  }
   render = () => {
-    let {onLoginAttempt, onUsernameChange, onPasswordChange, username, password} = this.props;
+    let {onLoginAttempt, onUsernameChange, onPasswordChange, username, password, loginFieldsValid} = this.props;
+
     return (
       <Col xs={10} xsOffset={1} md={4} mdOffset={4} >
         <div>
-        <h2>Login</h2>
-        <Form>
-          <FormGroup>
-            <Col componentClass={ControlLabel}>
-              Email:
-            </Col>
-            <Col>
-              <FormControl type="email" placeholder="Email" />
-            </Col>
-          </FormGroup>
+        <h2 className="login">Login</h2>
+        <Form className="login" onKeyDown={(e) => {
+        if (e.keyCode === 13) {
+          onLoginAttempt(username, password, e);
+        }
+        }}>
           <FormGroup>
             <Col componentClass={ControlLabel}>
               Username:
@@ -48,8 +50,9 @@ class Login extends Component {
               <FormControl type="password" placeholder="Password" onChange={onPasswordChange} />
             </Col>
           </FormGroup>
+          {loginFieldsValid ? null : <h2>Username or password invalid</h2>}
           <FormGroup>
-            <Col className="login">
+            <Col className="loginButton">
               <Button bsStyle="primary" onClick={onLoginAttempt.bind(this, username, password)}>
                 Log in
               </Button>
@@ -69,7 +72,7 @@ class Login extends Component {
 }
 
 let mapStateToProps = (state) => ({
-  ...state.auth
+  ...state.login
 })
 
 let mapActionsToProps = (dispatch) => (
@@ -77,16 +80,24 @@ let mapActionsToProps = (dispatch) => (
     onLoginAttempt: function(username, password, e) {
 
       dm.login(username, password);
+      dispatch({
+        type: 'IS_LOGGIN_IN'
+      });
+    },
+    resetLogin: function() {
+    dispatch({
+      type: 'RESET_LOGIN'
+    });
     },
     onUsernameChange: function(e: Event) {
       dispatch({
-        type: 'KEYPRESS_USERNAME',
+        type: 'KP_LOGIN_USERNAME',
         username: e.target.value
       })
     },
     onPasswordChange: function(e: Event) {
       dispatch({
-        type: 'KEYPRESS_PASSWORD',
+        type: 'KP_LOGIN_PASSWORD',
         password: e.target.value
       })
     }
