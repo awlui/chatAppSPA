@@ -27,11 +27,12 @@
   to { transform: rotate(360deg); }
 }*/
 
-.login {
-  text-align: center;
+.login .form-group {
+  vertical-align: top;
 }
-.loginButton {
-  margin: 10px;
+
+.login button {
+  padding: 3;
 }
 .signup {
   padding: 0.5em;
@@ -47,4 +48,34 @@
 
 div.alert.alert-danger {
   margin: 0;
+}
+
+.wave {
+  position: absolute;
+}
+.form-group {
+  position: relative;
+}
+.wave-hide {
+  visibility: hidden;
+}
+
+.username {
+}
+
+.password {
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+.login-button {
+  margin-right: 5px;
+}
+
+.invalid {
+  visibility: visible;
+}
+
+.valid {
+  visibility: hidden;
 }

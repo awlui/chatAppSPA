@@ -1,22 +1,10 @@
 import {createStore} from 'redxjs';
 
 
-//AuthToken !null means that the user is authenticated
 let auth = function(state, action) {
 
   switch(action.type) {
-    // case "KEYPRESS_USERNAME":
-    //   return { ...state, username: action.username }
-    // case "KEYPRESS_PASSWORD":
-    //   return { ...state, password: action.password }
-    // case "EMPTY_SIGNUP":
-    //   return { ...state, username: undefined, password: undefined, firstName: undefined, lastName: undefined, email: undefined, validations: undefined}
-    // case "KEYPRESS_EMAIL":
-    //   return { ...state, email: action.email}
-    // case "KEYPRESS_FNAME":
-    //   return { ...state, firstName: action.firstName}
-    // case "KEYPRESS_LNAME":
-    //   return { ...state, lastName: action.lastName}
+
     case "AUTHENTICATE":
       return {
         ...state, token: action.token
@@ -44,13 +32,22 @@ let signup = function(state, action) {
       return { ...state, firstName: action.firstName}
     case "KP_LASTNAME":
       return { ...state, lastName: action.lastName}
-    case "SIGNUP_VALIDATION_FAIL":
+    case "PASS_VALIDATION":
       return {
-        ...state, validations: action.validations
+        ...state, validations: { ...state.validations, ...action.validation}
       }
-    case "SIGNUP_VALIDATION_SUCCESS":
+    case "CHECKING_USERNAME":
+    console.log("CHECKING", action.value)
       return {
-        ...state, validations: undefined
+        ...state, checkingExistence: action.value
+      }
+    case "USERNAME_EXISTS":
+      return {
+        ...state, exists: true
+      }
+    case "USERNAME_DOESNT_EXIST":
+      return {
+        ...state, exists: false
       }
     default:
       return state;
@@ -68,7 +65,16 @@ let login = function(state, action) {
       }
     case "UNAUTHORIZED":
       return {
-        ...state, loginFieldsValid: false
+        ...state, loginFieldsValid: false, isLoggingIn: false
+      }
+    case "IS_LOGGING_IN":
+    console.log('isLoggingIn');
+      return {
+        ...state, isLoggingIn: true
+      }
+    case "AUTHENTICATE":
+      return {
+        ...state, isLoggingIn: false
       }
     default:
       return state;

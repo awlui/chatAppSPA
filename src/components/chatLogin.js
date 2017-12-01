@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import {
-  Col,
-  Form,
-  FormGroup,
+  Nav,
+  Navbar,
+  Button,
   FormControl,
-  ControlLabel,
-  Button
+  FormGroup
 } from 'react-bootstrap';
 import {
   Link,
@@ -29,7 +28,7 @@ import {
 } from 'better-react-spinkit'
 
 
-class Login extends Component {
+class ChatLogin extends Component {
   componentWillUnmount() {
     let {resetLogin} = this.props;
     resetLogin();
@@ -38,54 +37,32 @@ class Login extends Component {
     let {onLoginAttempt, onUsernameChange, onPasswordChange, username, password, loginFieldsValid, isLoggingIn} = this.props;
 
     return (
-      <Col xs={10} xsOffset={1} md={4} mdOffset={4} >
-        <div>
-        <h2 className="login">Login</h2>
-        <Form className="login" onKeyDown={(e) => {
-        if (e.keyCode === 13) {
-          onLoginAttempt(username, password, e);
-        }
+        <Navbar.Form className="login" pullRight onKeyDown={(e) => {
+          console.log(e.keyCode)
+          if (e.keyCode === 13) {
+            onLoginAttempt(username, password, e);
+          } 
         }}>
-          <div className="wave">
-            <FadingCircle className={isLoggingIn ? null : "wave-hide"} size={30}/>
-          </div>
           <FormGroup>
-            <Col componentClass={ControlLabel}>
-              Username:
-            </Col>
-            <Col>
-              <FormControl type="text" placeholder="Username"  onChange={onUsernameChange} />
-            </Col>
+              <FormControl className="username" type="text" placeholder="Username"  onChange={onUsernameChange} />
           </FormGroup>
           <FormGroup>
-            <Col componentClass={ControlLabel}>
-              Password:
-            </Col>
-            <Col>
-              <FormControl type="password" placeholder="Password" onChange={onPasswordChange} />
-            </Col>
+              <FormControl className="password" type="password" placeholder="Password" onChange={onPasswordChange} />
           </FormGroup>
-          {loginFieldsValid ? null : <div style={{color: "#FF563C"}}><i className="fa fa-window-close-o"></i> Username or password invalid.</div>}
           <FormGroup>
-            <Col className="loginButton">
-              <Button disabled={isLoggingIn} bsStyle="primary" onClick={onLoginAttempt.bind(this, username, password)}>
+          </FormGroup>
+          <FormGroup>
+              <Button className="login-button" disabled={isLoggingIn} bsStyle="primary" onClick={onLoginAttempt.bind(this, username, password)}>
                 Log in
               </Button>
-            </Col>
-            <Col className="signup">
-            <Button className="signup" componentClass={Link} to="/signup" bsStyle="default" type="submit">
-              Sign up
-            </Button>
-            </Col>
+              <FadingCircle className={isLoggingIn ? "wave" : "wave wave-hide"} color="white" size={30}/>
           </FormGroup>
-      </Form>
-        </div>
-
-      </Col>
+          <div className={loginFieldsValid ? "valid" : "invalid"} style={{color: "#FF563C"}}><i className="fa fa-window-close-o"></i> Username or password invalid.</div>
+        </Navbar.Form>
     )
   }
 }
-
+// {loginFieldsValid ? null : <div style={{color: "#FF563C"}}><i className="fa fa-window-close-o"></i> Username or password invalid.</div>}
 let mapStateToProps = (state) => ({
   ...state.login
 })
@@ -124,4 +101,4 @@ let mapActionsToProps = (dispatch) => (
   }
 )
 
-export default connect(mapStateToProps, mapActionsToProps)(Login);
+export default connect(mapStateToProps, mapActionsToProps)(ChatLogin);

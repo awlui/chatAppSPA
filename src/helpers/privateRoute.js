@@ -6,7 +6,7 @@ import {
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={props => (
-    props.isAuthenticated ? (
+    rest.isAuthenticated ? (
       <Component {...props}/>
     ) : (
       <Redirect to={{

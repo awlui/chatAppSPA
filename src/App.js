@@ -9,13 +9,19 @@ import {
   Link,
   Route,
   BrowserRouter as Router,
-  Redirect
 } from 'react-router-dom';
 import {connect} from 'redxjs';
 import store from './stores/redxjsStore';
 import dm from './externals/chatAppAdapter.js';
-import {SignUp, ChatNav, Login} from './components';
-import {PublicOnlyRoute} from './helpers';
+import {SignUp, ChatNav, Login, AsyncComponent} from './components';
+import {PublicOnlyRoute, PrivateRoute} from './helpers';
+
+
+// let home = Observable.defer(() => {
+//   return Observable.fromPromise(import('./home'));
+// }).share();
+
+
 class App extends Component {
   componentWillMount() {
     let {reducerObservable} = this.props;
@@ -31,7 +37,14 @@ class App extends Component {
         <Grid className="show-grid">
           <Row>
             <Col xs={12}>
-              <Route exact path="/" component={Home}/>
+              <Route exact path="/" render={(props) => {
+                return (
+                  <div>
+                      {token ? <Home /> : <SignUp isAuthenticated={token} />}
+                </div>
+                )
+              }
+              }/>
               <Route path="/about" component={AboutTwo}/>
               <Route path="/topics" component={Topics}/>
               <PublicOnlyRoute path="/login" isAuthenticated={token} component={Login}/>
@@ -44,9 +57,17 @@ class App extends Component {
     );
   }
 }
+
+// <Route exact path='/' render={(props) => 
+//   (
+//   <PageContent {...props} pass_to_page_content='hi' />
+// )
+
+// }/>
 let stateToProps = (state) => ({
   auth: state.auth
 })
+
 let dispatchToProps = (dispatch) => ({
   logout: (history, e) => {
     dispatch({
@@ -56,7 +77,7 @@ let dispatchToProps = (dispatch) => ({
   },
   reducerObservable: () => {
     dm.masterObservable.subscribe((e: any) => {
-      console.log("EVENT NAME", e.name, store.getState())
+      console.log("Observable Event:", e.name, e)
       switch(e.name) {
         case 'authenticated':
           dispatch({
@@ -65,9 +86,28 @@ let dispatchToProps = (dispatch) => ({
           })
           break;
         case 'unauthorized':
+          dispatch({
+            type: 'UNAUTHORIZED'
+          });
           break;
         case 'reconnected':
           dm.relogin(store.getState().auth.token);
+          break;
+        case 'usernameExist':
+          dispatch({
+            type: 'CHECKING_USERNAME',
+            value: false
+          });
+          if (e.wsmessage.data.exist) {
+            dispatch({
+              type: 'USERNAME_EXISTS',
+            });
+          } else {
+            dispatch({
+              type: 'USERNAME_DOESNT_EXIST'
+            });
+          }
+          break;
       default:
         break;
 
@@ -79,10 +119,12 @@ let dispatchToProps = (dispatch) => ({
 App = connect(stateToProps, dispatchToProps)(App);
 export default App;
 
-const Home = ({location}) => {
+const Home = ({location, extraProps}) => {
   return (
   <div>
+    {extraProps} HERE
     <h2 className="home">Home</h2>
+    
   </div>
 )
 }

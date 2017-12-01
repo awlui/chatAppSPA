@@ -6,7 +6,7 @@ let store;
 let initialState = {
   auth: {
     message: "initial state",
-    authToken: 'fakeAuthToken'
+    token: 'fakeAuthToken'
   }
 }
 const reducer = function(state, action) {
@@ -21,7 +21,9 @@ const reducer = function(state, action) {
 }
 beforeEach(() => {
   store = createStore({
-    auth: reducer
+    auth: reducer,
+    login: reducer,
+    signup: reducer
   }, initialState);
 });
 describe("Validation" , () => {
