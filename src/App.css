@@ -65,7 +65,11 @@ div.alert.alert-danger {
 
 .password {
   margin-right: 20px;
-  margin-left: 20px;
+}
+@media (min-width: 800px)  {
+  .password {
+    margin-left: 20px;
+  }
 }
 
 .login-button {
@@ -76,6 +80,12 @@ div.alert.alert-danger {
   visibility: visible;
 }
 
+.invalid-icon {
+  position: absolute;
+  right: 30px;
+  top: 10px;
+  color: red;
+}
 .valid {
   visibility: hidden;
 }
