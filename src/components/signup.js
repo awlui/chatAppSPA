@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { Observable } from 'rxjs/Rx';
+import ReactDOM from 'react-dom';
 import {
   Col,
   Form,
@@ -54,8 +55,29 @@ class SignUp extends Component {
   }
   render = () => {
     let {onUsernameChange, onFirstNameChange, onLastNameChange, signUpAttempt, onEmailChange,
-      onPasswordChange, username, password, lastName, firstName, email, checkingExistence, checkUsername, exists, makeDirty, inFocus, outFocus} = this.props;
-      console.log(this.props, 'val')
+      onPasswordChange, username, password, lastName, firstName, email, checkingExistence, 
+      checkUsername, exists, makeDirty, inFocus, outFocus, allInvalid} = this.props;
+      const emailProps = {
+      container: this,
+      target: () => ReactDOM.findDOMNode(this.refs.email),
+    };
+    const usernameProps = {
+      container: this,
+      target: () => ReactDOM.findDOMNode(this.refs.username)
+    }
+    const firstNameProps = {
+      container: this,
+      target: () => ReactDOM.findDOMNode(this.refs.firstName)
+    }
+    const lastNameProps = {
+      container: this,
+      target: () => ReactDOM.findDOMNode(this.refs.lastName)  
+    }
+    const passwordProps = {
+      container: this,
+      target: () => ReactDOM.findDOMNode(this.refs.password)  
+
+    }
     return (
       <Col xs={10} xsOffset={1}  >
         <div>
@@ -69,19 +91,20 @@ class SignUp extends Component {
     }
         >
           <FormGroup>
-            <Row>
+            <Row style={{position: 'relative'}}>
             <Col xs={12} componentClass={ControlLabel}>
               Email:
             </Col>
-            <OverlayTrigger  rootClose={true} placement="right" trigger={true} overlay={tooltip}>
-              <Col xs={12} md={6}>
-                      {(!email || !email.valid) &&  (!email || email.dirty) && (!email || !email.inFocus) ? (<i className="fa fa-times invalid-icon" aria-hidden="true"></i>) : null
+            <Col xs={12} md={6}  className="" style={{ display: 'inline-block'}} ref="email" >
+                                  {(!email || !email.valid) &&  (!email || email.dirty) && (!email || !email.inFocus) ? (<i className="fa fa-times invalid-icon" aria-hidden="true"></i>) : null
                       
                       }
-                      <FormControl  type="email"  onFocus={inFocus.bind(this, 'email')} onBlur={() => { makeDirty('email'); outFocus("email"); }} placeholder="Email" onChange={onEmailChange}/>
-              </Col>
-            </OverlayTrigger>
+              <FormControl  type="email"  onFocus={inFocus.bind(this, 'email')} onBlur={() => { makeDirty('email'); outFocus("email"); }} placeholder="Email" onChange={onEmailChange}/>
+            </Col>
 
+            <Overlay {...emailProps} show={email.inFocus && email.dirty && !email.valid} placement="top">
+              <Tooltip id="overload-top">Please input valid email.</Tooltip>
+            </Overlay>
             </Row>
           </FormGroup>
           <FormGroup>
@@ -89,23 +112,24 @@ class SignUp extends Component {
             <Col xs={12} componentClass={ControlLabel}>
               Username:
             </Col>
-            <OverlayTrigger rootClose={true} placement="right" trigger={true} overlay={tooltip}>
-              <Col xs={12} md={6}>
-                      {(!username || !username.valid) &&  (!username || username.dirty) && (!username || !username.inFocus) ? (<i className="fa fa-times invalid-icon" aria-hidden="true"></i>) : null
+            <Col xs={12} md={6}  className="" style={{ display: 'inline-block'}} ref="username" >
+                                  {(!username || !username.valid) &&  (!username || username.dirty) && (!username || !username.inFocus) ? (<i className="fa fa-times invalid-icon" aria-hidden="true"></i>) : null
                       
                       }
-                      <FormControl  type="text"  onFocus={inFocus.bind(this, 'username')} 
+                                    <FormControl  type="text"  onFocus={inFocus.bind(this, 'username')} 
                         onBlur={() => { makeDirty('username'); outFocus("username"); }} placeholder="Username" onChange={(e) => {
                         onUsernameChange(e);
                         this._usernameObserver(e.target.value)
                         checkUsername();
               }}/>
-              {checkingExistence && usernameVal(username.value) ? <Wave color="#337ab7" /> : null}
+                            {checkingExistence && usernameVal(username.value) ? <Wave color="#337ab7" /> : null}
               {(!checkingExistence && usernameVal(username.value) ? (exists === false ? <div style={{color: "#00B233"}}>
                 <i className="fa fa-check-square-o"></i> Username is available</div> : <div style={{color: "#FF563C"}}><i className="fa fa-window-close-o"></i> Username is taken</div>) : null) }
-              </Col>
-            </OverlayTrigger>
+            </Col>
 
+            <Overlay {...usernameProps} show={username.inFocus && username.dirty && !username.valid} placement="top">
+              <Tooltip id="overload-top">Username must be 6 to 20 characters long.</Tooltip>
+            </Overlay>
 
             </Row>
           </FormGroup>
@@ -114,16 +138,15 @@ class SignUp extends Component {
             <Col xs={12} componentClass={ControlLabel}>
               First Name:
             </Col>
-            <Col xs={12} md={6}>
-              <FormControl  type="text" onBlur={makeDirty.bind(this, 'firstName')}  placeholder="First Name"  onChange={onFirstNameChange} />
+            <Col xs={12} md={6}  className="" style={{ display: 'inline-block'}} ref="firstName" >
+                                  {(!firstName || !firstName.valid) &&  (!firstName || firstName.dirty) && (!firstName || !firstName.inFocus) ? (<i className="fa fa-times invalid-icon" aria-hidden="true"></i>) : null
+                      
+                      }
+              <FormControl  type="text" onFocus={inFocus.bind(this, 'firstName')} onBlur={() => {makeDirty('firstName'); outFocus('firstName') }}  placeholder="First Name"  onChange={onFirstNameChange} />
             </Col>
-            <Col xs={12} md={6}>
-            {(firstName || firstName.valid) ? null :
-            <Alert bsStyle='danger'>
-            <div>Must fill in first name.</div>
-          </Alert>
-            }
-            </Col>
+            <Overlay {...firstNameProps} show={firstName.inFocus && firstName.dirty && !firstName.valid} placement="top">
+              <Tooltip id="overload-top">Please input your first name.</Tooltip>
+            </Overlay>
             </Row>
           </FormGroup>
           <FormGroup>
@@ -131,9 +154,15 @@ class SignUp extends Component {
             <Col xs={12} componentClass={ControlLabel}>
               Last Name:
             </Col>
-            <Col xs={12} md={6}>
-              <FormControl type="text" onBlur={makeDirty.bind(this, 'lastName')}  placeholder="Last Name"  onChange={onLastNameChange} />
+            <Col xs={12} md={6}  className="" style={{ display: 'inline-block'}} ref="lastName" >
+                                  {(!lastName || !lastName.valid) &&  (!lastName || lastName.dirty) && (!lastName || !lastName.inFocus) ? (<i className="fa fa-times invalid-icon" aria-hidden="true"></i>) : null
+                      
+                      }
+              <FormControl  type="text" onFocus={inFocus.bind(this, 'lastName')} onBlur={() => {makeDirty('lastName'); outFocus('lastName') }}  placeholder="Last Name"  onChange={onLastNameChange} />
             </Col>
+            <Overlay {...lastNameProps} show={lastName.inFocus && lastName.dirty && !lastName.valid} placement="top">
+              <Tooltip id="overload-top">Please input your last name.</Tooltip>
+            </Overlay>
             </Row>
           </FormGroup>
           <FormGroup>
@@ -141,9 +170,15 @@ class SignUp extends Component {
             <Col xs={12} componentClass={ControlLabel}>
               Password:
             </Col>
-            <Col xs={12} md={6}>
-              <FormControl type="password" onBlur={makeDirty.bind(this, 'password')}  placeholder="Password" onChange={onPasswordChange} />
+            <Col xs={12} md={6}  className="" style={{ display: 'inline-block'}} ref="password" >
+                                  {(!password || !password.valid) &&  (!password || password.dirty) && (!password || !password.inFocus) ? (<i className="fa fa-times invalid-icon" aria-hidden="true"></i>) : null
+                      
+                      }
+              <FormControl  type="password" onFocus={inFocus.bind(this, 'password')} onBlur={() => {makeDirty('password'); outFocus('password') }}  placeholder="Password"  onChange={onPasswordChange} />
             </Col>
+            <Overlay {...passwordProps} show={password.inFocus && password.dirty && !password.valid} placement="top">
+              <Tooltip id="overload-top">Please input your password. Between 6 to 20 characters long.</Tooltip>
+            </Overlay>
             </Row>
           </FormGroup>
           <FormGroup>
@@ -151,6 +186,9 @@ class SignUp extends Component {
               <Button bsStyle="primary" onClick={signUpAttempt.bind(this, {username, password, email, firstName, lastName})}>
                 Sign up
               </Button>
+              {
+                allInvalid ? <div>Fix invalid fields then try again.</div> : null
+              }
             </Col>
           </FormGroup>
       </Form>
@@ -170,27 +208,31 @@ let mapStateToProps = (state) => (
 let mapActionsToProps = (dispatch) => (
   {
     signUpAttempt: function(data: any, e: Event) {
-        let validations = {
-          usernameVal: usernameVal(data.username.value),
-          passwordVal: passwordVal(data.password.value),
-          emailVal: emailVal(data.email.value),
-          firstNameVal: notEmptyVal(data.firstName.value),
-          lastNameVal: notEmptyVal(data.lastName.value)
-        }
         let flag = false;
-        Object.keys(validations).forEach((val) => {
-          if (!validations[val]) {
+        Object.keys(data).forEach((val) => {
+          if (!data[val].valid) {
             flag = true;
           }
         });
-        
+        let {username, password, email, firstName, lastName} = data;
         if (!flag) {
-          dm.signUp(data);
+          dm.signUp({
+            username: username.value,
+            password: password.value,
+            email: email.value,
+            firstName: firstName.value,
+            lastName: lastName.value
+          });
         } else {
-          // dispatch({
-          //   type: 'FAIL_VALIDATION',
-          //   validations
-          // });
+        Object.keys(data).forEach((val) => {
+          dispatch({
+            type: 'MAKE_DIRTY',
+            field: val
+          })
+        });
+        dispatch({
+          type: 'ALL_FIELDS_INVALID'
+        })
         }
     },
     onUsernameChange: function(e: Event) {
@@ -267,7 +309,6 @@ let mapActionsToProps = (dispatch) => (
         email: e.target.value
       });
       if (emailVal(e.target.value)) {
-        console.log(e.target.value, 'valid')
         dispatch({
           type: 'PASS_VALIDATION',
           validation: { field: 'email', value: true }
@@ -292,10 +333,12 @@ let mapActionsToProps = (dispatch) => (
       });
     },
     inFocus: function(field) {
+      console.log(store.getState(), 'state');
       dispatch({
         type: 'FOCUS_FIELD',
         field
       })
+            console.log(store.getState(), 'state');
     },
     outFocus: function(field) {
       dispatch({

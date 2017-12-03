@@ -1,4 +1,4 @@
-import SignUp from './signup2';
+import SignUp from './signup';
 import Login from './login';
 import ChatNav from './chatNav';
 import AsyncComponent from './AsyncComponent';
