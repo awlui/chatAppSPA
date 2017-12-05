@@ -15,11 +15,11 @@ import store from './stores/redxjsStore';
 import dm from './externals/chatAppAdapter.js';
 import {SignUp, ChatNav, Login, AsyncComponent} from './components';
 import {PublicOnlyRoute, PrivateRoute} from './helpers';
+import {Observable} from 'rxjs/Rx'
 
-
-// let home = Observable.defer(() => {
-//   return Observable.fromPromise(import('./home'));
-// }).share();
+let chatApp = Observable.defer(() => {
+  return Observable.fromPromise(import('./components/chatAppHome').then((comp) => { console.log(comp); return comp;}));
+}).share();
 
 
 class App extends Component {
@@ -34,24 +34,27 @@ class App extends Component {
       <Router>
       <div className="App">
         <ChatNav logout={logout} isAuthenticated={token}/>
-        <Grid className="show-grid">
-          <Row>
-            <Col xs={12}>
+        <div className="show-grid">
               <Route exact path="/" render={(props) => {
                 return (
                   <div>
-                      {token ? <Home /> : <SignUp isAuthenticated={token} />}
+                      {token ? <AsyncComponent moduleProvider={chatApp} /> : null}
                 </div>
                 )
               }
               }/>
+          <Grid className="show-grid">
+          <Row>
+            <Col xs={12}>
+              {token ? null : (<Route path="/" render={() => (<SignUp />)} />) }
               <Route path="/about" component={AboutTwo}/>
               <Route path="/topics" component={Topics}/>
               <PublicOnlyRoute path="/login" isAuthenticated={token} component={Login}/>
               <PublicOnlyRoute path="/signup" isAuthenticated={token} component={SignUp}/>
             </Col>
           </Row>
-        </Grid>
+          </Grid>
+        </div>
       </div>
       </Router>
     );
@@ -119,15 +122,7 @@ let dispatchToProps = (dispatch) => ({
 App = connect(stateToProps, dispatchToProps)(App);
 export default App;
 
-const Home = ({location, extraProps}) => {
-  return (
-  <div>
-    {extraProps} HERE
-    <h2 className="home">Home</h2>
-    
-  </div>
-)
-}
+
 
 let About = ({auth}, context) => {
   return (

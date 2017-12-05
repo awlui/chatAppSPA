@@ -22,7 +22,6 @@ export default class AsyncComponent extends Component {
   render() {
     const { Component } = this.state;
 
-    //The magic happens here!
     return (
       <div>
         {Component ? <Component /> : null }

@@ -12,9 +12,9 @@ import {
 } from 'react-router-dom';
 import {RouterLink} from '../helpers';
 import ChatLogin from './chatLogin';
-let ChatNav = ({location, isAuthenticated, logout, history}) => {
+let ChatNav = ({isAuthenticated, logout, history}) => {
   return (
-  <Navbar inverse collapseOnSelect>
+  <Navbar className="chat-nav" inverse collapseOnSelect>
     <Navbar.Header>
       <Navbar.Brand>
         <RouterLink to="/" className="navbar-brand">Home</RouterLink>
